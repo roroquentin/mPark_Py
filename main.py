@@ -23,36 +23,28 @@ class ParkCam:
     self.placeID = placeID
     self.status = status
 
-for placeID,pos in enumerate(posList):
-    cam1 = ParkCam(placeID, "dolu")
-    P = {
-        u'parkplatz': cam1.placeID,
-        u'status': cam1.status,
-    }
-
-    db.collection(u'cam1').document(u'{}'.format(placeID)).set(P)
-
 def checkParkingSpace(imgPro):
     spaceCounter = 0
 
     for placeID, pos in enumerate(posList):
         x, y = pos
 
+
         imgCrop = imgPro[y:y + height, x:x + width]
         # cv2.imshow(str(x * y), imgCrop)
         count = cv2.countNonZero(imgCrop)
-
+        cvzone.putTextRect(img, str(placeID), (x + width - 30, y + height - 30), scale=1, thickness=2, offset=0,
+                           colorR=(0, 0, 255))
         if count < 870:
             color = (0, 255, 0)
             thickness = 5
             spaceCounter += 1
-            cam1 = ParkCam(placeID, "boş")
+            cam1 = ParkCam(placeID, "Empty")
             P = {
-                u'parkplatz': cam1.placeID,
+                u'placeID': cam1.placeID,
                 u'status': cam1.status,
             }
-
-            db.collection(u'cam1').document(u'{}'.format(placeID)).update(P)
+            db.collection(u'cam1').document(u'{}'.format(placeID)).set(P)
 
         else:
             color = (0, 0, 255)
