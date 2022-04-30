@@ -6,11 +6,9 @@ width, height = 107, 48
 try:
     with open('CarParkPos', 'rb') as f:
         posList = pickle.load(f)
-    with open('CarParkPosID', 'rb') as f:
-        posListID = pickle.load(f)
 except:
     posList = []
-    posListID = []
+
 
 
 def mouseClick(events, x, y, flags, params):
@@ -24,14 +22,6 @@ def mouseClick(events, x, y, flags, params):
 
     with open('CarParkPos', 'wb') as f:
         pickle.dump(posList, f)
-
-
-for i, pos in enumerate(posList):
-    x,y = pos
-    posListID.append((i,(x,y)))
-
-with open('CarParkPosID', 'wb') as f:
-    pickle.dump(posListID, f)
 
 
 while True:

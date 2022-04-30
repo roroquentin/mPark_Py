@@ -16,35 +16,26 @@ cap = cv2.VideoCapture('carPark.mp4')
 with open('CarParkPos', 'rb') as f:
     posList = pickle.load(f)
 
-with open('CarParkPosID', 'rb') as f:
-    posListID = pickle.load(f)
-
 width, height = 107, 48
 
-
 class ParkCam:
-    def __int__(self, placeID, status):
-        self.placeID = placeID
-        self.status = status
+  def __init__(self, placeID, status):
+    self.placeID = placeID
+    self.status = status
 
-    def setFirebase(self):
-        for i, pos in posListID:
-            placeID = self.placeID
-            status = self.status
-            setPark = {
-                u'placeID': placeID,
-                u'status': status,
-            }
-            db.collection(u'ParkCam1').document(u'{}'.format(placeID)).set(setPark)
+for placeID,pos in enumerate(posList):
+    cam1 = ParkCam(placeID, "dolu")
+    P = {
+        u'parkplatz': cam1.placeID,
+        u'status': cam1.status,
+    }
 
-cam1 = ParkCam(-1, "Undefined")
-cam1.setFirebase()
-
+    db.collection(u'cam1').document(u'{}'.format(placeID)).set(P)
 
 def checkParkingSpace(imgPro):
     spaceCounter = 0
 
-    for pos in posList:
+    for placeID, pos in enumerate(posList):
         x, y = pos
 
         imgCrop = imgPro[y:y + height, x:x + width]
@@ -55,8 +46,13 @@ def checkParkingSpace(imgPro):
             color = (0, 255, 0)
             thickness = 5
             spaceCounter += 1
+            cam1 = ParkCam(placeID, "boş")
+            P = {
+                u'parkplatz': cam1.placeID,
+                u'status': cam1.status,
+            }
 
-
+            db.collection(u'cam1').document(u'{}'.format(placeID)).update(P)
 
         else:
             color = (0, 0, 255)
