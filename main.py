@@ -1,6 +1,7 @@
 import cv2
 import pickle
 import cvzone
+import goto
 import numpy as np
 import firebase_admin
 from firebase_admin import credentials
@@ -26,20 +27,20 @@ class ParkCam(object):
         self.latitude = latitude
         self.longitude = longitude
 
-
-def setDataFirestore(placeID, status):
-    cam1 = ParkCam(placeID, status, "12.1245", "49.4561")
-    camUpdateList = {
-        u'placeID': cam1.placeID,
-        u'status': cam1.status,
-        u'latitude': cam1.latitude,
-        u'longitude': cam1.longitude,
-    }
-    db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
+#for placeID,pos in enumerate(posList):
+#    cam1 = ParkCam(placeID, "Busy", "12.1245", "49.4561")
+#    camUpdateList = {
+#        u'placeID': cam1.placeID,
+#        u'status': cam1.status,
+#        u'latitude': cam1.latitude,
+#        u'longitude': cam1.longitude,
+#    }
+#    db.collection(u'cam1').document(u'{}'.format(placeID)).update(camUpdateList)
 
 
 def checkParkingSpace(imgPro):
     spaceCounter = 0
+
 
     for placeID, pos in enumerate(posList):
         x, y = pos
@@ -50,14 +51,31 @@ def checkParkingSpace(imgPro):
         cvzone.putTextRect(img, str(placeID), (x + width - 30, y + height - 30), scale=1, thickness=2, offset=0,
                            colorR=(0, 0, 255))
         if count < 850:
+            cam1 = ParkCam(placeID, "Empty", "12.1245", "49.4561")
             color = (0, 255, 0)
             thickness = 5
             spaceCounter += 1
-            setDataFirestore(placeID, "Boş")
+            camUpdateList = {
+                u'placeID': cam1.placeID,
+                u'status': cam1.status,
+                u'latitude': cam1.latitude,
+                u'longitude': cam1.longitude,
+            }
+            db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
 
         else:
             color = (0, 0, 255)
             thickness = 2
+            cam1 = ParkCam(placeID, "Busy", "12.1245", "49.4561")
+            camUpdateList = {
+                u'placeID': cam1.placeID,
+                u'status': cam1.status,
+                u'latitude': cam1.latitude,
+                u'longitude': cam1.longitude,
+            }
+            db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
+
+
 
         cv2.rectangle(img, pos, (pos[0] + width, pos[1] + height), color, thickness)
         cvzone.putTextRect(img, str(count), (x, y + height - 3), scale=1,
