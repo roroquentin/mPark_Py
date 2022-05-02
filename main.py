@@ -18,10 +18,25 @@ with open('CarParkPos', 'rb') as f:
 
 width, height = 107, 48
 
-class ParkCam:
-  def __init__(self, placeID, status):
-    self.placeID = placeID
-    self.status = status
+
+class ParkCam(object):
+    def __init__(self, placeID, status, latitude, longitude):
+        self.placeID = placeID
+        self.status = status
+        self.latitude = latitude
+        self.longitude = longitude
+
+
+def setDataFirestore(placeID, status):
+    cam1 = ParkCam(placeID, status, "12.1245", "49.4561")
+    camUpdateList = {
+        u'placeID': cam1.placeID,
+        u'status': cam1.status,
+        u'latitude': cam1.latitude,
+        u'longitude': cam1.longitude,
+    }
+    db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
+
 
 def checkParkingSpace(imgPro):
     spaceCounter = 0
@@ -29,22 +44,16 @@ def checkParkingSpace(imgPro):
     for placeID, pos in enumerate(posList):
         x, y = pos
 
-
         imgCrop = imgPro[y:y + height, x:x + width]
         # cv2.imshow(str(x * y), imgCrop)
         count = cv2.countNonZero(imgCrop)
         cvzone.putTextRect(img, str(placeID), (x + width - 30, y + height - 30), scale=1, thickness=2, offset=0,
                            colorR=(0, 0, 255))
-        if count < 870:
+        if count < 850:
             color = (0, 255, 0)
             thickness = 5
             spaceCounter += 1
-            cam1 = ParkCam(placeID, "Empty")
-            P = {
-                u'placeID': cam1.placeID,
-                u'status': cam1.status,
-            }
-            db.collection(u'cam1').document(u'{}'.format(placeID)).set(P)
+            setDataFirestore(placeID, "Boş")
 
         else:
             color = (0, 0, 255)
@@ -72,6 +81,7 @@ while True:
     imgDilate = cv2.dilate(imgMedian, kernel, iterations=1)
 
     checkParkingSpace(imgDilate)
+
     cv2.imshow("Image", img)
     # cv2.imshow("ImageBlur", imgBlur)
     # cv2.imshow("ImageThres", imgMedian)
