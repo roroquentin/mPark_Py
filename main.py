@@ -1,7 +1,7 @@
 import cv2
 import pickle
 import cvzone
-import goto
+import json
 import numpy as np
 import firebase_admin
 from firebase_admin import credentials
@@ -27,7 +27,8 @@ class ParkCam(object):
         self.latitude = latitude
         self.longitude = longitude
 
-#for placeID,pos in enumerate(posList):
+
+# for placeID,pos in enumerate(posList):
 #    cam1 = ParkCam(placeID, "Busy", "12.1245", "49.4561")
 #    camUpdateList = {
 #        u'placeID': cam1.placeID,
@@ -40,6 +41,8 @@ class ParkCam(object):
 
 def checkParkingSpace(imgPro):
     spaceCounter = 0
+
+    general_dict = {}
 
 
     for placeID, pos in enumerate(posList):
@@ -55,34 +58,34 @@ def checkParkingSpace(imgPro):
             color = (0, 255, 0)
             thickness = 5
             spaceCounter += 1
-            camUpdateList = {
-                u'placeID': cam1.placeID,
+            general_dict[placeID] = {
+                u'placeID': str(cam1.placeID),
                 u'status': cam1.status,
                 u'latitude': cam1.latitude,
                 u'longitude': cam1.longitude,
             }
-            db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
 
         else:
             color = (0, 0, 255)
             thickness = 2
             cam1 = ParkCam(placeID, "Busy", "12.1245", "49.4561")
-            camUpdateList = {
-                u'placeID': cam1.placeID,
+            general_dict[placeID] = {
+                u'placeID': str(cam1.placeID),
                 u'status': cam1.status,
                 u'latitude': cam1.latitude,
                 u'longitude': cam1.longitude,
             }
-            db.collection(u'cam1').document(u'{}'.format(placeID)).set(camUpdateList)
-
-
 
         cv2.rectangle(img, pos, (pos[0] + width, pos[1] + height), color, thickness)
         cvzone.putTextRect(img, str(count), (x, y + height - 3), scale=1,
                            thickness=2, offset=0, colorR=color)
-
+    print(general_dict)
     cvzone.putTextRect(img, f'Free: {spaceCounter}/{len(posList)}', (100, 50), scale=3,
                        thickness=5, offset=20, colorR=(0, 200, 0))
+
+    for id, info in general_dict.items():
+        db.collection(u'cam1').document(u'{}'.format(id)).set(info)
+
 
 
 while True:
