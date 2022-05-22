@@ -12,12 +12,12 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Video feed
-cap = cv2.VideoCapture('carPark.mp4')
+cap = cv2.VideoCapture('parkVideo.mp4')
 
 with open('CarParkPos', 'rb') as f:
     posList = pickle.load(f)
 
-width, height = 107, 48
+width, height = 120, 110
 
 
 class ParkCam(object):
