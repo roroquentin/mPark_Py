@@ -12,7 +12,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Video feed
-cap = cv2.VideoCapture('carPark.mp4')
+cap = cv2.VideoCapture('/dev/video0')
 
 with open('CarParkPos', 'rb') as f:
     posList = pickle.load(f)
