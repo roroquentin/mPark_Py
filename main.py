@@ -12,12 +12,12 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Video feed
-cap = cv2.VideoCapture('parkVideo.mp4')
+cap = cv2.VideoCapture('/dev/video0') # usb cam bağlantısı
 
 with open('CarParkPos', 'rb') as f:
     posList = pickle.load(f)
 
-width, height = 120, 110
+width, height = 107, 48
 
 
 class ParkCam(object):
@@ -26,17 +26,6 @@ class ParkCam(object):
         self.status = status
         self.latitude = latitude
         self.longitude = longitude
-
-
-# for placeID,pos in enumerate(posList):
-#    cam1 = ParkCam(placeID, "Busy", "12.1245", "49.4561")
-#    camUpdateList = {
-#        u'placeID': cam1.placeID,
-#        u'status': cam1.status,
-#        u'latitude': cam1.latitude,
-#        u'longitude': cam1.longitude,
-#    }
-#    db.collection(u'cam1').document(u'{}'.format(placeID)).update(camUpdateList)
 
 
 def checkParkingSpace(imgPro):
@@ -82,9 +71,9 @@ def checkParkingSpace(imgPro):
     print(general_dict)
     cvzone.putTextRect(img, f'Free: {spaceCounter}/{len(posList)}', (100, 50), scale=3,
                        thickness=5, offset=20, colorR=(0, 200, 0))
-
-    for id, info in general_dict.items():
-        db.collection(u'cam1').document(u'{}'.format(id)).set(info)
+#
+#    for id, info in general_dict.items():
+#        db.collection(u'cam1').document(u'{}'.format(id)).set(info)
 
 
 
