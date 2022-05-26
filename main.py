@@ -71,9 +71,9 @@ def checkParkingSpace(imgPro):
     print(general_dict)
     cvzone.putTextRect(img, f'Free: {spaceCounter}/{len(posList)}', (100, 50), scale=3,
                        thickness=5, offset=20, colorR=(0, 200, 0))
-#
-#    for id, info in general_dict.items():
-#        db.collection(u'cam1').document(u'{}'.format(id)).set(info)
+
+   for id, info in general_dict.items():
+        db.collection(u'cam1').document(u'{}'.format(id)).set(info)
 
 
 
